@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeGuru Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0e16;--bg2:#141420;--bg3:#1c1c2c;--bg4:#222235;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);
+  --accent:#a78bfa;--accent2:#7c3aed;--green:#34d399;--red:#f87171;
+  --amber:#fbbf24;--blue:#60a5fa;
+  --text:#e8e8f0;--muted:#5a5a7a;--muted2:#8888aa;
+  --card:#141420;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:14px}
+
+/* TOP NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;z-index:10}
+.nav-left{display:flex;align-items:center;gap:20px}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-icon{width:28px;height:28px;background:var(--accent2);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.brand-name{font-size:14px;font-weight:700;color:var(--text)}
+.nav-tabs{display:flex;gap:2px}
+.nav-tab{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted2);border:none;background:transparent;transition:all .15s;font-family:'DM Sans',sans-serif}
+.nav-tab.active,.nav-tab:hover{background:var(--bg3);color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.sync-btn{display:flex;align-items:center;gap:6px;background:var(--accent2);border:none;color:#fff;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.sync-btn:hover{background:#6d28d9}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* MAIN LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* LEFT SIDEBAR */
+.sidebar{width:56px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0}
+.sidebar-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .15s;color:var(--muted2)}
+.sidebar-icon:hover,.sidebar-icon.active{background:var(--bg3);color:var(--accent)}
+
+/* MAIN CONTENT */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* VIEWS */
+.view{flex:1;overflow-y:auto;padding:20px 24px;display:none}
+.view.active{display:block}
+.view::-webkit-scrollbar{width:4px}
+.view::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* DASHBOARD VIEW */
+.greeting{margin-bottom:20px}
+.greeting h1{font-size:20px;font-weight:600;margin-bottom:2px}
+.greeting h1 span{color:var(--accent)}
+.greeting p{font-size:12px;color:var(--muted2)}
+
+/* TOP STATS ROW */
+.stats-row{display:grid;grid-template-columns:1fr repeat(3,1fr);gap:12px;margin-bottom:12px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.stat-card.main{background:var(--bg2);border-color:var(--border2)}
+.stat-label{font-size:11px;color:var(--muted2);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.stat-val{font-size:26px;font-weight:700;font-family:'DM Mono',monospace;line-height:1.1}
+.stat-val.red{color:var(--red)}
+.stat-val.green{color:var(--green)}
+.stat-val.purple{color:var(--accent)}
+.stat-sub{font-size:11px;color:var(--muted2);margin-top:4px}
+.stat-badge{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600}
+.stat-badge.green{background:rgba(52,211,153,.12);color:var(--green)}
+.stat-badge.red{background:rgba(248,113,113,.12);color:var(--red)}
+.stat-badge.purple{background:rgba(167,139,250,.12);color:var(--accent)}
+
+/* SECOND ROW */
+.second-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.mini-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.mini-label{font-size:11px;color:var(--muted2);margin-bottom:5px}
+.mini-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
+.mini-val.green{color:var(--green)}
+.mini-val.red{color:var(--red)}
+.mini-val.amber{color:var(--amber)}
+.mini-sub{font-size:10px;color:var(--muted2);margin-top:3px}
+
+/* BOTTOM ROW */
+.bottom-row{display:grid;grid-template-columns:1fr 1.6fr;gap:12px}
+
+/* TRADE SCORE */
+.score-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.score-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.score-title{font-size:12px;font-weight:600;color:var(--muted2)}
+.score-val{font-size:32px;font-weight:800;color:var(--amber);font-family:'DM Mono',monospace}
+.score-trend{font-size:11px;color:var(--green)}
+.radar-wrap{display:flex;justify-content:center;margin-bottom:14px}
+.score-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.score-metric{display:flex;justify-content:space-between;align-items:center}
+.sm-name{font-size:11px;color:var(--muted2)}
+.sm-bar-wrap{flex:1;height:4px;background:var(--bg3);border-radius:99px;margin:0 8px;overflow:hidden}
+.sm-bar{height:100%;border-radius:99px}
+.sm-val{font-size:11px;font-weight:600;font-family:'DM Mono',monospace;min-width:24px;text-align:right}
+
+/* ACTIVITY */
+.activity-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.activity-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.activity-title{font-size:12px;font-weight:600;color:var(--muted2)}
+.activity-legend{display:flex;gap:12px;font-size:10px;color:var(--muted2)}
+.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:3px}
+.dots-grid{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:12px}
+.trade-dot{width:12px;height:12px;border-radius:50%;cursor:pointer;transition:transform .1s}
+.trade-dot:hover{transform:scale(1.4)}
+.trade-dot.win{background:var(--green)}
+.trade-dot.loss{background:var(--red)}
+.activity-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ast-val{font-size:18px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)}
+.ast-label{font-size:10px;color:var(--muted2);margin-top:2px}
+.ast-sub{font-size:11px;color:var(--green);font-weight:600}
+
+/* UPLOAD CARD */
+.upload-card{background:var(--card);border:1.5px dashed var(--border2);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s}
+.upload-card:hover,.upload-card.drag{border-color:var(--accent);background:rgba(167,139,250,.04)}
+.upload-icon{font-size:32px;margin-bottom:12px}
+.upload-title{font-size:15px;font-weight:600;margin-bottom:6px}
+.upload-sub{font-size:12px;color:var(--muted2);line-height:1.6}
+.upload-btn-inner{display:inline-flex;align-items:center;gap:6px;margin-top:16px;background:var(--accent2);color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600}
+#csvFile{display:none}
+
+/* CHAT VIEW */
+.chat-layout{display:flex;flex:1;overflow:hidden;height:100%}
+.chat-history{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.chat-history::-webkit-scrollbar{width:3px}
+.chat-history::-webkit-scrollbar-thumb{background:var(--border2)}
+.chat-msg{display:flex;gap:10px;animation:fu .25s ease}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.chat-msg.user{flex-direction:row-reverse}
+.chat-av{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.chat-av.ai{background:var(--accent2);color:#fff}
+.chat-av.user{background:var(--bg3);border:1px solid var(--border2);color:var(--muted2)}
+.chat-bubble{max-width:68%;padding:11px 15px;border-radius:12px;font-size:13px;line-height:1.65;word-wrap:break-word}
+.chat-msg.ai .chat-bubble{background:var(--bg3);border:1px solid var(--border);border-radius:3px 12px 12px 12px}
+.chat-msg.user .chat-bubble{background:var(--accent2);color:#fff;border-radius:12px 3px 12px 12px}
+.chat-bubble strong{font-weight:700}
+.chat-bubble .p{color:var(--green);font-weight:600}
+.chat-bubble .l{color:var(--red);font-weight:600}
+.chat-bubble .h{color:var(--accent);font-weight:600}
+.typing{display:flex;gap:4px;align-items:center;padding:2px 0}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--muted2);animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* CHAT SIDEBAR */
+.chat-sidebar{width:220px;border-left:1px solid var(--border);background:var(--bg2);padding:14px;overflow-y:auto;flex-shrink:0}
+.chat-sidebar::-webkit-scrollbar{width:3px}
+.chat-sidebar-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.quick-q{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--muted2);padding:8px 10px;border-radius:8px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:left;margin-bottom:5px;transition:all .15s;display:flex;align-items:center;gap:6px;line-height:1.3}
+.quick-q:hover{border-color:var(--accent);color:var(--accent);background:rgba(167,139,250,.05)}
+
+/* CHAT INPUT */
+.chat-input-area{padding:14px 20px 16px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.chat-input-row{display:flex;gap:8px;align-items:flex-end}
+.chat-input-wrap{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;display:flex;align-items:center;padding:0 13px;transition:border-color .2s}
+.chat-input-wrap:focus-within{border-color:var(--accent)}
+#chatInput{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:11px 0;resize:none;max-height:120px}
+#chatInput::placeholder{color:var(--muted)}
+.chat-send{width:38px;height:38px;background:var(--accent2);border:none;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s;flex-shrink:0;color:#fff}
+.chat-send:hover{background:#6d28d9;transform:scale(1.05)}
+.chat-send:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.chat-hint{font-size:10px;color:var(--muted);margin-top:7px;text-align:center}
+
+/* WELCOME CHAT */
+.chat-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:10px;padding:30px}
+.chat-welcome h3{font-size:17px;font-weight:700}
+.chat-welcome p{font-size:13px;color:var(--muted2);max-width:300px;line-height:1.6}
+
+/* NO DATA */
+.no-data-msg{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* TRADES VIEW */
+.trades-table{width:100%;border-collapse:collapse}
+.trades-table th{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left}
+.trades-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;font-family:'DM Mono',monospace}
+.trades-table tr:hover td{background:var(--bg3)}
+.td-sym{font-weight:600;color:var(--text)}
+.td-buy{color:var(--green);font-weight:600}
+.td-sell{color:var(--red);font-weight:600}
+.section-title{font-size:16px;font-weight:700;margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="nav">
+  <div class="nav-left">
+    <div class="brand">
+      <div class="brand-icon">📊</div>
+      <span class="brand-name">TradeGuru Pro</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showView('dashboard')">Dashboard</button>
+      <button class="nav-tab" onclick="showView('trades')">Trades</button>
+      <button class="nav-tab" onclick="showView('chat')">AI Chat</button>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="pulse"></div>
+    <label style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">
+      📁 CSV Upload
+      <input type="file" id="csvFile" accept=".csv" onchange="handleFile(this.files[0])" style="display:none">
+    </label>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- ICON SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-icon active" onclick="showView('dashboard')" title="Dashboard">🏠</div>
+    <div class="sidebar-icon" onclick="showView('trades')" title="Trades">📋</div>
+    <div class="sidebar-icon" onclick="showView('chat')" title="AI Chat">💬</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- DASHBOARD VIEW -->
+    <div class="view active" id="view-dashboard">
+      <div class="greeting">
+        <h1>Good evening, <span id="greetName">Gaurav</span> 👋</h1>
+        <p id="greetSub">Upload CSV to see your trading performance overview</p>
+      </div>
+
+      <div id="noDataBanner" class="no-data-msg">
+        ⚠️ Koi data nahi — upar CSV Upload karo. Myfxbook → History → Export → CSV
+      </div>
+
+      <!-- TOP STATS -->
+      <div class="stats-row">
+        <div class="stat-card main">
+          <div class="stat-label">Today <span>📅</span></div>
+          <div class="stat-val red" id="todayPL">--</div>
+          <div class="stat-sub" id="todayDate">--</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Current Balance</div>
+          <div class="stat-val purple" id="balance">--</div>
+          <div class="stat-sub">Broker account</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total P&L</div>
+          <div class="stat-val green" id="totalPL">--</div>
+          <div class="stat-sub" id="totalStats">-- trades · -- win rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">This Month</div>
+          <div class="stat-val red" id="monthPL">--</div>
+          <div class="stat-sub" id="monthTrades">-- trades this month</div>
+        </div>
+      </div>
+
+      <!-- SECOND ROW -->
+      <div class="second-row">
+        <div class="mini-card">
+          <div class="mini-label">Biggest Win 🏆</div>
+          <div class="mini-val green" id="bigWin">--</div>
+          <div class="mini-sub">Single trade best</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-label">Biggest Loss 💀</div>
+          <div class="mini-val red" id="bigLoss">--</div>
+          <div class="mini-sub">Single trade worst</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-label">Best Day 🌟</div>
+          <div class="mini-val green" id="bestDay">--</div>
+          <div class="mini-sub" id="bestDayDate">--</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-label">Profit Factor</div>
+          <div class="mini-val amber" id="profitFactor">--</div>
+          <div class="mini-sub">Win/Loss ratio</div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="bottom-row">
+        <!-- TRADE SCORE -->
+        <div class="score-card">
+          <div class="score-header">
+            <div>
+              <div class="score-title">Trade Score</div>
+              <div class="score-val" id="tradeScore">--</div>
+              <div class="score-trend" id="scoreTrend">Upload CSV to calculate</div>
+            </div>
+          </div>
+          <div class="score-metrics" id="scoreMetrics">
+            <div style="font-size:12px;color:var(--muted2);grid-column:1/-1;text-align:center;padding:16px 0">CSV upload karo</div>
+          </div>
+        </div>
+
+        <!-- ACTIVITY -->
+        <div class="activity-card">
+          <div class="activity-header">
+            <div class="activity-title">Trading Activity</div>
+            <div class="activity-legend">
+              <span><span class="legend-dot" style="background:var(--red)"></span>Loss</span>
+              <span><span class="legend-dot" style="background:var(--green)"></span>Profit</span>
+            </div>
+          </div>
+          <div class="dots-grid" id="dotsGrid">
+            <div style="font-size:12px;color:var(--muted2);padding:16px 0">CSV upload karo — trades yahan dikhengi</div>
+          </div>
+          <div class="activity-stats" id="activityStats">
+            <div><div class="ast-val" id="daysTd">--</div><div class="ast-label">Days Traded</div></div>
+            <div><div class="ast-val" id="greenDays">--</div><div class="ast-label">Green Days</div><div class="ast-sub" id="longestStreak">--</div></div>
+            <div><div class="ast-val red" id="redDays">--</div><div class="ast-label">Red Days</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRADES VIEW -->
+    <div class="view" id="view-trades">
+      <div class="section-title">All Trades</div>
+      <div id="tradesContent">
+        <div style="text-align:center;padding:48px;color:var(--muted2)">CSV upload karo — trades yahan dikhengi</div>
+      </div>
+    </div>
+
+    <!-- CHAT VIEW -->
+    <div class="view" id="view-chat" style="padding:0;display:none;flex-direction:column">
+      <div class="chat-layout">
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+          <div class="chat-history" id="chatHistory">
+            <div class="chat-welcome" id="chatWelcome">
+              <div style="font-size:36px">🤖</div>
+              <h3>TradeGuru AI</h3>
+              <p>Tera personal trading analyst. CSV upload karke phir kuch bhi pooch — brutally honest jawab milega!</p>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div class="chat-input-row">
+              <div class="chat-input-wrap">
+                <textarea id="chatInput" rows="1" placeholder="Kuch bhi poochho apni trading ke baare mein..."></textarea>
+              </div>
+              <button class="chat-send" id="chatSend" onclick="sendChat()">➤</button>
+            </div>
+            <div class="chat-hint">Enter = send · Shift+Enter = new line</div>
+          </div>
+        </div>
+        <!-- QUICK QUESTIONS SIDEBAR -->
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-label">Quick Questions</div>
+          <button class="quick-q" onclick="askQuick('Mera best trade kaunsa tha aur usme kya sahi kiya?')">🏆 Best trade</button>
+          <button class="quick-q" onclick="askQuick('Worst trade kaunsa tha? Kya galat hua?')">💀 Worst trade</button>
+          <button class="quick-q" onclick="askQuick('Mujhe kab trade karna chahiye? Best session batao.')">⏰ Best session</button>
+          <button class="quick-q" onclick="askQuick('Kya mein emotionally trade kar raha hun?')">🧠 Emotional?</button>
+          <button class="quick-q" onclick="askQuick('Mera risk management kaisa hai?')">🎯 Risk check</button>
+          <button class="quick-q" onclick="askQuick('Prop firm challenge pass kar sakta hun?')">🏦 Prop firm</button>
+          <button class="quick-q" onclick="askQuick('30 din ka improvement roadmap do.')">🗺️ Roadmap</button>
+          <button class="quick-q" onclick="askQuick('Overall rating 10 mein se kya hai?')">⭐ Rating</button>
+          <button class="quick-q" onclick="askQuick('Kaunsa symbol mujhe avoid karna chahiye?')">⚠️ Avoid kya?</button>
+          <button class="quick-q" onclick="askQuick('Meri sabse badi trading weakness kya hai?')">🔍 Weakness</button>
+          <div class="chat-sidebar-label" style="margin-top:16px">Account Stats</div>
+          <div id="chatStats" style="font-size:11px;color:var(--muted2)">CSV upload karo</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let tradeData = null;
+let chatHistory = [];
+const INR = n => '₹' + Math.round(n).toLocaleString('en-IN');
+
+// VIEW SWITCHING
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => {
+    el.classList.remove('active');
+    el.style.display = 'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
+
+  const views = ['dashboard','trades','chat'];
+  const idx = views.indexOf(v);
+  const viewEl = document.getElementById('view-' + v);
+  if (v === 'chat') {
+    viewEl.style.display = 'flex';
+    viewEl.classList.add('active');
+  } else {
+    viewEl.style.display = 'block';
+    viewEl.classList.add('active');
+  }
+  document.querySelectorAll('.nav-tab')[idx]?.classList.add('active');
+  document.querySelectorAll('.sidebar-icon')[idx]?.classList.add('active');
+}
+
+// FILE HANDLING
+function handleFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => parseCSV(e.target.result, file.name);
+  reader.readAsText(file);
+}
+
+function parseCSV(text, name) {
+  const lines = text.split('\n');
+  let trades = [], deps = 0, wds = 0;
+
+  for (let line of lines) {
+    const c = line.split(',').map(x => x.trim().replace(/"/g,''));
+    if (c.length < 8) continue;
+    const act = (c[3]||'').toLowerCase();
+    const profit = parseFloat(c[c.length-1]);
+    if ((act==='buy'||act==='sell') && !isNaN(profit)) {
+      trades.push({ openDate:c[0], closeDate:c[1], symbol:c[2], action:c[3], lots:parseFloat(c[4])||0, openPrice:parseFloat(c[7])||0, closePrice:parseFloat(c[8])||0, pips:parseFloat(c[9])||0, profit });
+    }
+    if (act==='deposit' && !isNaN(profit) && profit>0) deps += profit;
+    if (act==='withdrawal' && !isNaN(profit)) wds += Math.abs(profit);
+  }
+
+  if (!trades.length) { alert('CSV parse nahi hua — Myfxbook format check karo!'); return; }
+
+  const wins = trades.filter(t=>t.profit>0);
+  const losses = trades.filter(t=>t.profit<0);
+  const totalP = trades.reduce((s,t)=>s+t.profit,0);
+  const winRate = ((wins.length/trades.length)*100).toFixed(1);
+  const bigWin = Math.max(...trades.map(t=>t.profit));
+  const bigLoss = Math.min(...trades.map(t=>t.profit));
+  const avgWin = wins.length ? wins.reduce((s,t)=>s+t.profit,0)/wins.length : 0;
+  const avgLoss = losses.length ? Math.abs(losses.reduce((s,t)=>s+t.profit,0)/losses.length) : 0;
+  const pf = avgLoss > 0 ? (avgWin/avgLoss).toFixed(2) : 'N/A';
+
+  // Day analysis
+  const dayMap = {};
+  trades.forEach(t => {
+    const d = t.openDate ? t.openDate.split(' ')[0] : '';
+    if (!d) return;
+    if (!dayMap[d]) dayMap[d] = 0;
+    dayMap[d] += t.profit;
+  });
+  const days = Object.entries(dayMap);
+  const greenDays = days.filter(d=>d[1]>0).length;
+  const redDays = days.filter(d=>d[1]<0).length;
+  const bestDayEntry = days.sort((a,b)=>b[1]-a[1])[0];
+
+  // Hour analysis
+  const hourMap = {};
+  trades.forEach(t => {
+    const h = parseInt(t.openDate?.split(' ')[1]?.split(':')[0]||0);
+    if (!hourMap[h]) hourMap[h]={profit:0,count:0};
+    hourMap[h].profit += t.profit; hourMap[h].count++;
+  });
+  const bestHour = Object.entries(hourMap).sort((a,b)=>b[1].profit-a[1].profit)[0];
+  const worstHour = Object.entries(hourMap).sort((a,b)=>a[1].profit-b[1].profit)[0];
+
+  // Symbol analysis
+  const symMap = {};
+  trades.forEach(t => {
+    if (!symMap[t.symbol]) symMap[t.symbol]={profit:0,count:0};
+    symMap[t.symbol].profit+=t.profit; symMap[t.symbol].count++;
+  });
+  const bestSym = Object.entries(symMap).sort((a,b)=>b[1].profit-a[1].profit)[0];
+
+  // Month analysis
+  const now = new Date();
+  const thisMonth = trades.filter(t => {
+    const d = new Date(t.openDate);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  });
+  const monthPL = thisMonth.reduce((s,t)=>s+t.profit,0);
+
+  // Score calculation
+  const rrScore = avgLoss>0 ? Math.min(100, (avgWin/avgLoss)*50) : 0;
+  const wrScore = Math.min(100, parseFloat(winRate)*1.5);
+  const consScore = Math.min(100, (greenDays/(days.length||1))*100);
+  const pfScore = pf!=='N/A' ? Math.min(100, parseFloat(pf)*40) : 0;
+  const overallScore = Math.round((rrScore+wrScore+consScore+pfScore)/4);
+
+  tradeData = { name, trades, wins:wins.length, losses:losses.length, totalP, winRate, bigWin, bigLoss, avgWin, avgLoss, pf, deps, wds, bestHour, worstHour, bestSym, symMap, dayMap, greenDays, redDays, bestDayEntry, monthPL, monthTrades:thisMonth.length, rrScore, wrScore, consScore, pfScore, overallScore, symbols:Object.keys(symMap) };
+
+  updateDashboard();
+  updateTradesTable();
+  updateChatStats();
+  document.getElementById('noDataBanner').style.display = 'none';
+  addChatMsg('ai', `<strong>✅ ${trades.length} trades load ho gaye!</strong><br>Win rate: <span class="${parseFloat(winRate)>=50?'p':'l'}">${winRate}%</span> | Net P&L: <span class="${totalP>=0?'p':'l'}">${INR(totalP)}</span> | Score: <span class="h">${overallScore}/100</span><br><br>Chat mein kuch bhi pooch! 🔥`);
+}
+
+function updateDashboard() {
+  const d = tradeData;
+  const today = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('greetSub').textContent = 'Here is your trading performance overview';
+  document.getElementById('todayDate').textContent = today;
+  document.getElementById('todayPL').textContent = INR(d.totalP);
+  document.getElementById('todayPL').className = `stat-val ${d.totalP>=0?'green':'red'}`;
+  document.getElementById('balance').textContent = INR(d.deps - d.wds + d.totalP);
+  document.getElementById('totalPL').textContent = INR(d.totalP);
+  document.getElementById('totalPL').className = `stat-val ${d.totalP>=0?'green':'red'}`;
+  document.getElementById('totalStats').textContent = `${d.trades.length} trades · ${d.winRate}% win rate`;
+  document.getElementById('monthPL').textContent = INR(d.monthPL);
+  document.getElementById('monthPL').className = `stat-val ${d.monthPL>=0?'green':'red'}`;
+  document.getElementById('monthTrades').textContent = `${d.monthTrades} trades this month`;
+  document.getElementById('bigWin').textContent = '+' + INR(d.bigWin);
+  document.getElementById('bigLoss').textContent = '-' + INR(Math.abs(d.bigLoss));
+  if (d.bestDayEntry) { document.getElementById('bestDay').textContent = '+' + INR(d.bestDayEntry[1]); document.getElementById('bestDayDate').textContent = d.bestDayEntry[0]; }
+  document.getElementById('profitFactor').textContent = d.pf;
+  document.getElementById('tradeScore').textContent = d.overallScore;
+  document.getElementById('scoreTrend').textContent = d.overallScore >= 60 ? '↑ Improving' : d.overallScore >= 40 ? '→ Stable' : '↓ Needs work';
+
+  // Score metrics
+  const metrics = [
+    {name:'Win Rate', val:d.wrScore, color:'var(--green)'},
+    {name:'Risk/Reward', val:d.rrScore, color:'var(--blue)'},
+    {name:'Consistency', val:d.consScore, color:'var(--accent)'},
+    {name:'Profit Factor', val:d.pfScore, color:'var(--amber)'},
+  ];
+  document.getElementById('scoreMetrics').innerHTML = metrics.map(m => `
+    <div class="score-metric">
+      <span class="sm-name">${m.name}</span>
+      <div class="sm-bar-wrap"><div class="sm-bar" style="width:${m.val}%;background:${m.color}"></div></div>
+      <span class="sm-val" style="color:${m.color}">${Math.round(m.val)}</span>
+    </div>
+  `).join('');
+
+  // Dots
+  const dots = d.trades.slice(-60).map(t => `<div class="trade-dot ${t.profit>=0?'win':'loss'}" title="${t.symbol} ${t.action}: ${INR(t.profit)}"></div>`).join('');
+  document.getElementById('dotsGrid').innerHTML = dots;
+  document.getElementById('daysTd').textContent = Object.keys(d.dayMap).length;
+  document.getElementById('greenDays').textContent = d.greenDays;
+  document.getElementById('redDays').textContent = d.redDays;
+  document.getElementById('longestStreak').textContent = 'Best streak';
+}
+
+function updateTradesTable() {
+  const d = tradeData;
+  const rows = d.trades.slice().reverse().slice(0,100).map(t => `
+    <tr>
+      <td class="td-sym">${t.symbol}</td>
+      <td class="${t.action==='Buy'?'td-buy':'td-sell'}">${t.action}</td>
+      <td>${t.lots}</td>
+      <td>${t.openDate}</td>
+      <td>${t.closeDate}</td>
+      <td style="color:${t.profit>=0?'var(--green)':'var(--red)'};font-weight:600">${INR(t.profit)}</td>
+      <td style="color:${t.pips>=0?'var(--green)':'var(--red)'}">${t.pips?.toFixed(1)||'--'}</td>
+    </tr>
+  `).join('');
+  document.getElementById('tradesContent').innerHTML = `
+    <table class="trades-table">
+      <thead><tr><th>Symbol</th><th>Action</th><th>Lots</th><th>Open</th><th>Close</th><th>P&L</th><th>Pips</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function updateChatStats() {
+  const d = tradeData;
+  document.getElementById('chatStats').innerHTML = `
+    <div style="margin-bottom:4px">Trades: <strong style="color:var(--text)">${d.trades.length}</strong></div>
+    <div style="margin-bottom:4px">Win Rate: <strong style="color:${parseFloat(d.winRate)>=50?'var(--green)':'var(--red)'}">${d.winRate}%</strong></div>
+    <div style="margin-bottom:4px">Net P&L: <strong style="color:${d.totalP>=0?'var(--green)':'var(--red)'}">${INR(d.totalP)}</strong></div>
+    <div style="margin-bottom:4px">Score: <strong style="color:var(--amber)">${d.overallScore}/100</strong></div>
+    <div>Best: <strong style="color:var(--green)">+${INR(d.bigWin)}</strong></div>
+  `;
+}
+
+function askQuick(q) { document.getElementById('chatInput').value = q; sendChat(); }
+
+async function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = ''; inp.style.height = 'auto';
+  document.getElementById('chatWelcome')?.remove();
+  addChatMsg('user', msg);
+  chatHistory.push({role:'user',content:msg});
+  const tid = addTypingBubble();
+  document.getElementById('chatSend').disabled = true;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:buildSys(), messages:chatHistory })
+    });
+    removeTypingBubble(tid);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const reply = data.content.map(b=>b.type==='text'?b.text:'').join('');
+    chatHistory.push({role:'assistant',content:reply});
+    addChatMsg('ai', fmt(reply));
+  } catch {
+    removeTypingBubble(tid);
+    const r = fallback(msg);
+    chatHistory.push({role:'assistant',content:r});
+    addChatMsg('ai', fmt(r));
+  }
+  document.getElementById('chatSend').disabled = false;
+}
+
+function buildSys() {
+  let s = `Tu "TradeGuru AI" hai — brutal honest Hindi trading analyst. Senior trader vibe — strict, direct, caring. Max 180 words. Use <strong> for emphasis.`;
+  if (tradeData) {
+    const d = tradeData;
+    const rr = d.avgLoss>0?(d.avgWin/d.avgLoss).toFixed(2):'N/A';
+    s += `\n\nGaurav ka data:\nTrades:${d.trades.length}|Wins:${d.wins}|Losses:${d.losses}|WinRate:${d.winRate}%|NetPL:${INR(d.totalP)}|BestTrade:+${INR(d.bigWin)}|WorstTrade:-${INR(Math.abs(d.bigLoss))}|AvgWin:${INR(d.avgWin)}|AvgLoss:${INR(d.avgLoss)}|RR:${rr}|PF:${d.pf}|Score:${d.overallScore}/100|Symbols:${d.symbols.join(',')}|BestHour:${d.bestHour?d.bestHour[0]+':00':'N/A'}|WorstHour:${d.worstHour?d.worstHour[0]+':00':'N/A'}`;
+  } else {
+    s += `\nKoi CSV data nahi. General advice de aur CSV upload karne ko bol.`;
+  }
+  return s;
+}
+
+function fallback(msg) {
+  if (!tradeData) return `Bhai pehle upar <strong>CSV Upload</strong> button se file load kar — phir main specific analysis dunga!`;
+  const d = tradeData;
+  const m = msg.toLowerCase();
+  if (m.includes('best trade')) return `Best trade: <strong class="p">+${INR(d.bigWin)}</strong>. Patience tha, direction sahi tha — <strong>yehi teri real skill hai.</strong>`;
+  if (m.includes('worst')) return `Worst trade: <strong class="l">-${INR(Math.abs(d.bigLoss))}</strong>. Emotional tha bhai — bada lot, no SL. <strong>Ek trade ne bahut nuqsan kiya.</strong>`;
+  if (m.includes('rating')) return `Score: <strong class="h">${d.overallScore}/100</strong>. ${d.overallScore>=60?'Decent hai par aur improve ho sakta hai.':'Bhai, kafi kaam karna hai. Risk management sab se pehle fix karo.'}`;
+  if (m.includes('session')||m.includes('kab')) return `Best session: <strong>${d.bestHour?d.bestHour[0]+':00–'+(parseInt(d.bestHour[0])+1)+':00':'7-10 AM'}</strong>. Is time pe focus rakh baaki avoid karo.`;
+  return `Specific pooch — best trade, session timing, emotional patterns, risk check. Main hun yahan! 💪`;
+}
+
+function fmt(t) {
+  return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+}
+
+function addChatMsg(type, html) {
+  const h = document.getElementById('chatHistory');
+  const d = document.createElement('div');
+  d.className = `chat-msg ${type}`;
+  const av = type==='ai'?'<div class="chat-av ai">AI</div>':'<div class="chat-av user">G</div>';
+  d.innerHTML = `${type==='ai'?av:''}<div class="chat-bubble">${html}</div>${type==='user'?av:''}`;
+  h.appendChild(d); h.scrollTop = h.scrollHeight;
+}
+
+let tc=0;
+function addTypingBubble() {
+  const id=++tc, h=document.getElementById('chatHistory'), d=document.createElement('div');
+  d.className='chat-msg ai'; d.id='t'+id;
+  d.innerHTML=`<div class="chat-av ai">AI</div><div class="chat-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  h.appendChild(d); h.scrollTop=h.scrollHeight; return id;
+}
+function removeTypingBubble(id) { document.getElementById('t'+id)?.remove(); }
+
+document.getElementById('chatInput').addEventListener('keydown', function(e) {
+  if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}
+  setTimeout(()=>{this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';},0);
+});
+
+setTimeout(()=>addChatMsg('ai',`<strong>Namaste Gaurav! 🙏</strong><br>Main hun TradeGuru AI. Upar <strong>CSV Upload</strong> se Myfxbook file load kar — phir dashboard bhar jaayega aur main chat mein <strong>brutal honest analysis</strong> dunga! 🔥`),400);
+</script>
+</body>
+</html>
